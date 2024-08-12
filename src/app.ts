@@ -1,6 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
-import { Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 
 const app: Application = express();
 
@@ -16,12 +16,13 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
     step1: Interface
     step2: Schema
     step3: Model
-    step4: Database Query
+    step4: Database Query on model 
     */
 
   //   res.send("Hello Worldd!");
   //   next();
 
+  // creating interface
   interface IUser {
     id: string;
     role: "student";
@@ -39,6 +40,7 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
     parmanentAddress: string;
   }
 
+  // creating schema
   const userSchema = new Schema<IUser>({
     id: { type: String, required: true, unique: true },
     role: { type: String, required: true },
@@ -61,6 +63,31 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
     presentAddress: { type: String, required: true },
     parmanentAddress: { type: String, required: true },
   });
+
+  // creating model
+  const User = model<IUser>("User", userSchema);
+
+  // connect Mongdb
+  const createUserToDb = async () => {
+    const user = new User({
+      id: "123456",
+      role: "student",
+      password: "1234",
+      name: {
+        firstName: "Shamim",
+        lastName: "Hossain",
+      },
+      gender: "male",
+      email: "farokafs000@gmail.com",
+      contactNo: "01618603009",
+      emergencyContactNo: "01818603009",
+      presentAddress: "Shukrabad",
+      parmanentAddress: "Tangail",
+    });
+    await user.save();
+    console.log(user);
+  };
+  createUserToDb();
 });
 
 export default app;
