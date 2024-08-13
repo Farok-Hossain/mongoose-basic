@@ -1,8 +1,10 @@
-import { model, Schema } from "mongoose";
-import { IUser } from "./user.interface";
+import { Model, model, Schema } from "mongoose";
+import { IUser, IUserMethods, UserModel } from "./user.interface";
+
+// type UserModel = Model<IUser, {}, IUserMethods>;
 
 // creating schema
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   id: { type: String, required: true, unique: true },
   role: { type: String, required: true },
   password: { type: String, required: true },
@@ -25,5 +27,14 @@ const userSchema = new Schema<IUser>({
   parmanentAddress: { type: String, required: true },
 });
 
+//
+userSchema.static("getStudentUsers", async function getStudentUsers() {
+  const students = await this.find({ role: "student" });
+});
+
+userSchema.method("fullName", function fullName() {
+  return this.name.firstName + " " + this.name.lastName;
+});
+
 // creating model
-export const User = model<IUser>("User", userSchema);
+export const User = model<IUser, UserModel>("User", userSchema);
